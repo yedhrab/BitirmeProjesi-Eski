@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GalleryActivity">
+
+    <ImageView
+        android:id="@+id/iv_detected_image"
+        android:layout_width="360dp"
+        android:layout_height="382dp"
+        android:layout_marginTop="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/btnChoseImage"
+        android:layout_width="144dp"
+        android:layout_height="87dp"
+        android:onClick="chooseImageGalery"
+        android:text="Choose Image to Galery"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_detected_image"
+        app:layout_constraintVertical_bias="0.502" />
+</androidx.constraintlayout.widget.ConstraintLayout>

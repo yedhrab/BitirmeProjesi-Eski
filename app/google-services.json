@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "349214263635",
+    "firebase_url": "https://aeye-24e2f.firebaseio.com",
+    "project_id": "aeye-24e2f",
+    "storage_bucket": "aeye-24e2f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:349214263635:android:4c77803b8f01dd03afb9a6",
+        "android_client_info": {
+          "package_name": "com.aeye.facedetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "349214263635-lnr453f30sgdtjn4ok3gh7ugmov4lq2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmEX1DHujEt6Jx73gdjF6wETt0-laMbVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "349214263635-lnr453f30sgdtjn4ok3gh7ugmov4lq2c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

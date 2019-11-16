@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FaceDetection</string>
+    <string name="first_button">Galeriden Yüz Yanıma</string>
+</resources>
