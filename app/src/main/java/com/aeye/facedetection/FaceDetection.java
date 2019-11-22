@@ -15,6 +15,7 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.tasks.Task;
@@ -28,6 +29,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Objects;
 
 import static android.content.Context.CAMERA_SERVICE;
 
@@ -127,29 +129,38 @@ public class FaceDetection {
         // On most devices, the sensor orientation is 90 degrees, but for some
         // devices it is 270 degrees. For devices with a sensor orientation of
         // 270, rotate the image an additional 180 ((270 + 270) % 360) degrees.
-        CameraManager cameraManager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
-        int sensorOrientation = cameraManager.getCameraCharacteristics(cameraId).get(CameraCharacteristics.SENSOR_ORIENTATION);
-        rotationCompensation = (rotationCompensation + sensorOrientation + 270) % 360;
+        int result;
+
+        try {
+            CameraManager cameraManager = Objects.requireNonNull((CameraManager) context.getSystemService(CAMERA_SERVICE));
+            CameraCharacteristics cameraCharacteristics = Objects.requireNonNull(cameraManager.getCameraCharacteristics(cameraId));
+            int sensorOrientation = Objects.requireNonNull(cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
+            rotationCompensation = (rotationCompensation + sensorOrientation + 270) % 360;
+
+            switch (rotationCompensation) {
+                case 0:
+                    result = FirebaseVisionImageMetadata.ROTATION_0;
+                    break;
+                case 90:
+                    result = FirebaseVisionImageMetadata.ROTATION_90;
+                    break;
+                case 180:
+                    result = FirebaseVisionImageMetadata.ROTATION_180;
+                    break;
+                case 270:
+                    result = FirebaseVisionImageMetadata.ROTATION_270;
+                    break;
+                default:
+                    result = FirebaseVisionImageMetadata.ROTATION_0;
+                    Log.e(TAG, "Bad rotation value: " + rotationCompensation);
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            result = FirebaseVisionImageMetadata.ROTATION_0;
+            Log.e(TAG, "Error on camera");
+        }
 
         // Return the corresponding FirebaseVisionImageMetadata rotation value.
-        int result;
-        switch (rotationCompensation) {
-            case 0:
-                result = FirebaseVisionImageMetadata.ROTATION_0;
-                break;
-            case 90:
-                result = FirebaseVisionImageMetadata.ROTATION_90;
-                break;
-            case 180:
-                result = FirebaseVisionImageMetadata.ROTATION_180;
-                break;
-            case 270:
-                result = FirebaseVisionImageMetadata.ROTATION_270;
-                break;
-            default:
-                result = FirebaseVisionImageMetadata.ROTATION_0;
-                Log.e(TAG, "Bad rotation value: " + rotationCompensation);
-        }
         return result;
     }
 }
