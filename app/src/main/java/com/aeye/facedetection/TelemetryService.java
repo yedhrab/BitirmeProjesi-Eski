@@ -44,7 +44,9 @@ public class TelemetryService extends Service {
                 // Kesme isteği geldiğinde isteği uygulama
                 Thread.currentThread().interrupt();
             }
-            stopSelf(msg.arg1);
+
+            // Servisin tekrar tekrar oluşturulmasından dolayı oluşan maliyeti engellemek adına kapatıldı
+            // stopSelf(msg.arg1);
         }
     }
 
