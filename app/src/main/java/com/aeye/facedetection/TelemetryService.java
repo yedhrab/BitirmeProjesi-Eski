@@ -24,6 +24,13 @@ import androidx.core.app.NotificationCompat;
 public class TelemetryService extends Service {
     private static final String TAG = "TelemetryService";
 
+    private static final int REQUEST_SHOW_CONTENT = 0;
+    private static final int REQUEST_STOP = 1;
+
+    static final String ACTION_START_SERVICE = "Start telemetry service";
+    static final String ACTION_STOP_SERVICE = "Stop telemetry service";
+
+
     private Looper telemetryLooper;
     private TelemetryHandler telemetryHandler;
 
@@ -64,9 +71,48 @@ public class TelemetryService extends Service {
         startForeground();
     }
 
+    public void startForeground() {
+        String channelId = "";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channelId = createNotificationChannel();
+        }
+
+        // Main uygulamayı açma isteği oluşturma
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, REQUEST_SHOW_CONTENT, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Servisi kapatma isteği oluşturma
+        Intent stopSelf = new Intent(this, TelemetryService.class);
+        stopSelf.setAction(TelemetryService.ACTION_STOP_SERVICE);
+        PendingIntent pStopSelf;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            pStopSelf = PendingIntent.getForegroundService(this, REQUEST_STOP, stopSelf, PendingIntent.FLAG_CANCEL_CURRENT);
+        } else {
+            pStopSelf = PendingIntent.getService(this, REQUEST_STOP, stopSelf, PendingIntent.FLAG_CANCEL_CURRENT);
+        }
+
+        // Intent exitIntent = new Intent(this, MainActivity.class);
+        // exitIntent.setAction(Intent.)
+
+
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.mipmap.face_deteciton)
+                .setContentTitle("Gözlük ile haberleşme aktif")
+                .setContentText("Akıllı gözlüğünüz ile arkaplanda haberleşme gerçekleşmektedir")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .addAction(R.mipmap.face_deteciton, "Kapat", pStopSelf)
+                .build();
+
+        startForeground(101, notification);
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private String createNotificationChannel() {
-        NotificationChannel channel = new NotificationChannel("Telemetry", "Telemetry", NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = new NotificationChannel("telemetry", "Telemetry Service", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setLightColor(Color.BLUE);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -77,40 +123,35 @@ public class TelemetryService extends Service {
         return "Telemetry";
     }
 
-
-    public void startForeground() {
-        String channelId = "";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channelId = createNotificationChannel();
-        }
-
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 ,intent, 0);
-        Notification notification = new NotificationCompat.Builder(this, channelId)
-                .setOngoing(true)
-                .setSmallIcon(R.mipmap.face_deteciton)
-                .setContentTitle("Gözlük ile haberleşme aktif")
-                .setContentText("Akıllı gözlüğünüz ile arkaplanda haberleşme gerçekleşmektedir")
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build();
-
-        startForeground(101, notification);
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Servis başlatıldı");
+        String intentAction = intent.getAction();
+        if (intentAction != null) {
+            switch (intentAction) {
+                case TelemetryService.ACTION_START_SERVICE: {
+                    Log.i(TAG, "Servis başlatıldı");
 
-        Message msg = telemetryHandler.obtainMessage();
-        msg.arg1 = startId; // İsteklerin yönetimi için kimlikleri saklamalıyız
-        telemetryHandler.sendMessage(msg);
+                    Message msg = telemetryHandler.obtainMessage();
+                    msg.arg1 = startId; // İsteklerin yönetimi için kimlikleri saklamalıyız
+                    telemetryHandler.sendMessage(msg);
+
+                    break;
+                }
+                case TelemetryService.ACTION_STOP_SERVICE: {
+                    stopForegroundService();
+                }
+            }
+        }
 
         // Eğer servis öldüyse, bu dönüşten sonra Intent'siz tekrar başlat
         return START_STICKY;
+    }
+
+    private void stopForegroundService() {
+        Log.d(TelemetryService.TAG, "Telemetry servisi sonlandırıldı");
+
+        stopForeground(true);
+        stopSelf();
     }
 
     @Override

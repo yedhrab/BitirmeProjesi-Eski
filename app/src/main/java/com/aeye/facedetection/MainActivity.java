@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         } else {
-            startService(new Intent(this, TelemetryService.class));
+            startService(new Intent(this, TelemetryService.class).setAction(TelemetryService.ACTION_START_SERVICE));
         }
     }
 
