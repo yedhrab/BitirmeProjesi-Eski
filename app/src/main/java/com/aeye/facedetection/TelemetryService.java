@@ -45,7 +45,7 @@ public class TelemetryService extends Service {
         @Override
         public void handleMessage(@NonNull Message msg) {
             try {
-                Log.i(TAG, "Mesaj alındı");
+                Log.d(TAG, "Mesaj alındı");
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // Kesme isteği geldiğinde isteği uygulama
@@ -59,7 +59,7 @@ public class TelemetryService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "Servis oluşturuldu");
+        Log.d(TAG, "Servis oluşturuldu");
 
         // Arkaplanda çalışacak thread'in tanımlanması ve başlatılması (UI thread'i bloklamaması lazım)
         HandlerThread thread = new HandlerThread("TelemetryStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
@@ -112,7 +112,8 @@ public class TelemetryService extends Service {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private String createNotificationChannel() {
-        NotificationChannel channel = new NotificationChannel("telemetry", "Telemetry Service", NotificationManager.IMPORTANCE_DEFAULT);
+        String channelId = "telemetry";
+        NotificationChannel channel = new NotificationChannel(channelId, "Telemetry Service", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setLightColor(Color.BLUE);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -120,7 +121,7 @@ public class TelemetryService extends Service {
             notificationManager.createNotificationChannel(channel);
         }
 
-        return "Telemetry";
+        return channelId;
     }
 
     @Override
@@ -129,7 +130,7 @@ public class TelemetryService extends Service {
         if (intentAction != null) {
             switch (intentAction) {
                 case TelemetryService.ACTION_START_SERVICE: {
-                    Log.i(TAG, "Servis başlatıldı");
+                    Log.d(TAG, "Servis başlatıldı");
 
                     Message msg = telemetryHandler.obtainMessage();
                     msg.arg1 = startId; // İsteklerin yönetimi için kimlikleri saklamalıyız
@@ -148,7 +149,7 @@ public class TelemetryService extends Service {
     }
 
     private void stopForegroundService() {
-        Log.d(TelemetryService.TAG, "Telemetry servisi sonlandırıldı");
+        Log.d(TelemetryService.TAG, "Servis sonlandırılıyor");
 
         stopForeground(true);
         stopSelf();
@@ -163,6 +164,6 @@ public class TelemetryService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "Servis kapatıldı");
+        Log.d(TAG, "Servis kapatıldı");
     }
 }
