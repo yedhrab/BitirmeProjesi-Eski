@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -15,7 +16,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -61,26 +61,44 @@ public class TelemetryService extends Service {
         telemetryLooper = thread.getLooper();
         telemetryHandler = new TelemetryHandler(telemetryLooper);
 
-        Notification notification = showNotification();
-        startForeground(1, notification);
+        startForeground();
     }
 
-    public Notification showNotification() {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            return new Notification.Builder(this, NotificationChannel.DEFAULT_CHANNEL_ID)
-                    .setContentTitle("Temp")
-                    .setContentText("Temp")
-                    .setSmallIcon(R.mipmap.face_deteciton)
-                    .setContentIntent(pendingIntent)
-                    .setTicker("Temp")
-                    .build();
+    @RequiresApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel() {
+        NotificationChannel channel = new NotificationChannel("Telemetry", "Telemetry", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setLightColor(Color.BLUE);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(channel);
         }
 
-        return null;
+        return "Telemetry";
+    }
+
+
+    public void startForeground() {
+        String channelId = "";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channelId = createNotificationChannel();
+        }
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 ,intent, 0);
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setOngoing(true)
+                .setSmallIcon(R.mipmap.face_deteciton)
+                .setContentTitle("Gözlük ile haberleşme aktif")
+                .setContentText("Akıllı gözlüğünüz ile arkaplanda haberleşme gerçekleşmektedir")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build();
+
+        startForeground(101, notification);
     }
 
     @Override
