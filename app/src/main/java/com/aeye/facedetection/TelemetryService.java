@@ -60,9 +60,28 @@ public class TelemetryService extends Service {
 
         telemetryLooper = thread.getLooper();
         telemetryHandler = new TelemetryHandler(telemetryLooper);
+
+        Notification notification = showNotification();
+        startForeground(1, notification);
     }
 
+    public Notification showNotification() {
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            return new Notification.Builder(this, NotificationChannel.DEFAULT_CHANNEL_ID)
+                    .setContentTitle("Temp")
+                    .setContentText("Temp")
+                    .setSmallIcon(R.mipmap.face_deteciton)
+                    .setContentIntent(pendingIntent)
+                    .setTicker("Temp")
+                    .build();
+        }
+
+        return null;
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
