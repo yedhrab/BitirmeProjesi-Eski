@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">FaceDetection</string>
     <string name="first_button">Galeriden Yüz Yanıma</string>
+    <string name="second_button">WIFI MODUL</string>
 </resources>
