@@ -2,33 +2,39 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aeye.facedetection">
 
+    <!-- Gallery'e erişim için eklendi -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- Foregorund servis için eklendi -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
+        android:allowBackup="false"
         android:icon="@mipmap/face_deteciton"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/face_deteciton"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:allowBackup="false">
-        <service
-            android:name=".TelemetryService"
-            android:enabled="true"
-            android:exported="false" />
+        android:theme="@style/AppTheme">
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="face" />
 
-        <activity android:name=".GalleryActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".GalleryActivity" />
+
+        <service
+            android:name=".TelemetryService"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 
 </manifest>
