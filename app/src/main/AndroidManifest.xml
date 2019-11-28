@@ -5,13 +5,15 @@
     <!-- Gallery'e erişim için eklendi -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!-- WiFi P2P bağlatısı için eklendi -->
+    <!-- Wi-Fi Direct (P2P) bağlatısı için eklendi -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Wi-Fi Direct için gerekli olmayabilir (?) -->
+    <!--<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
 
     <application
         android:allowBackup="false"
