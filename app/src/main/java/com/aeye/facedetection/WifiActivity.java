@@ -8,11 +8,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import java.security.Permission;
 
@@ -50,12 +54,13 @@ public class WifiActivity extends AppCompatActivity {
             // Wi-Fi P2P Frameworkü ile uygulamamıza bağlanmayı sağlayacak obje
             channel = manager.initialize(this, getMainLooper(), null);
 
-            // Wifi durumlarını kontrol etmemizi sağlayacak obje
-            wifiReceiver = new WiFiDirectBroadcastReciever(manager, channel, this);
             getRequiredPermissions();
         }
     }
 
+    /**
+     * Wi-Fi P2P için gerekli izinleri alma
+     */
     private void getRequiredPermissions() {
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
@@ -70,6 +75,8 @@ public class WifiActivity extends AppCompatActivity {
         if (requestCode == PRC_ACCES_FINE_LOCATION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Log.e(TAG, "Fine locaiton izni gereklidir");
+            } else {
+                Toast.makeText(this, "İzinler gereklidir 😥", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -78,7 +85,8 @@ public class WifiActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Alıcıyı kaydetme
+        // Alıcıyı oluşturma ve sisteme kaydetme
+        wifiReceiver = new WiFiDirectBroadcastReciever(manager, channel, this);
         registerReceiver(wifiReceiver, wifiFilter);
     }
 
@@ -88,5 +96,22 @@ public class WifiActivity extends AppCompatActivity {
 
         // Alıcının kaydını silme
         unregisterReceiver(wifiReceiver);
+    }
+
+    public void onDiscoverButtonClick(View view) {
+        Log.d(TAG, "onDiscoverButtonClick: Discover butonuna tıklandı");
+
+        // Eşleşebilir cihazları arama
+        manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "onSuccess: Keşif başarılı");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d(TAG, "onFailure: Keşif başarısız" + reason);
+            }
+        });
     }
 }
