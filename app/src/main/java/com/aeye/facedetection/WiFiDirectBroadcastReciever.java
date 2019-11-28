@@ -3,6 +3,7 @@ package com.aeye.facedetection;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -10,11 +11,11 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static com.aeye.facedetection.WifiActivity.TAG;
 
@@ -75,6 +76,22 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
                 // Respond to new connection or disconnections
                 case WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION:
                     Log.d(TAG, "onReceive: WiFi P2P bağlantısının durumu değişti");
+
+                    if (manager == null) {
+                        return;
+                    }
+
+                    // Grup bilgilerini ekrana basma
+                    // https://developer.android.com/reference/android/net/wifi/p2p/WifiP2pInfo.html#fields
+                    NetworkInfo networkInfo = Objects.requireNonNull(
+                            intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO)
+                    );
+                    if (networkInfo.isConnected()) {
+                        manager.requestConnectionInfo(channel, (info) -> {
+                            Log.d(TAG, "onReceive: P2P bağlantı verisi: " + info);
+                        });
+                    }
+
                     break;
                 // Respond to this device's wifi state changing
                 case WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION:
@@ -131,7 +148,8 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
                             case WifiP2pManager.BUSY:
                                 reasonMsg = "cihaz başka bir bağlantı ile meşgul";
                                 break;
-                        };
+                        }
+                        ;
 
                         Log.e(TAG, "onFailure: Wi-Fi P2P bağlantısı başarısız, " + reasonMsg);
                     }
