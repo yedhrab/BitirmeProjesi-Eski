@@ -3,11 +3,14 @@ package com.aeye.facedetection;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +23,8 @@ import static com.aeye.facedetection.WifiActivity.TAG;
  * https://developer.android.com/guide/topics/connectivity/wifip2p.html#create-br
  */
 public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements WifiP2pManager.PeerListListener {
+
+    private static final String DEVICE_PATTERN = "YEDHRAB-PC";
 
     WifiP2pManager manager;
     Channel channel;
@@ -93,8 +98,44 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
         if (peers.isEmpty()) {
             Log.d(TAG, "onPeersAvailable: Eşleşebilecek cihaz bulunamadı");
         } else {
+            WifiP2pDevice device = null;
             for (WifiP2pDevice peer : peers) {
                 Log.d(TAG, "onPeersAvailable: Cihaz adı: " + peer.deviceName);
+                if (peer.deviceName.contains(DEVICE_PATTERN)) {
+                    device = peer;
+                }
+            }
+
+            if (device != null) {
+                WifiP2pConfig config = new WifiP2pConfig();
+                config.deviceAddress = device.deviceAddress;
+                config.wps.setup = WpsInfo.PBC;
+
+                // İlk cihaza bağlanma
+                manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "onSuccess: Wi-Fi P2P bağlantısı başarılı");
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                        String reasonMsg = "";
+                        switch (reason) {
+                            case WifiP2pManager.P2P_UNSUPPORTED:
+                                reasonMsg = "P2P desteklenmiyor";
+                                break;
+                            case WifiP2pManager.ERROR:
+                                reasonMsg = "hata oluştu";
+                                break;
+                            case WifiP2pManager.BUSY:
+                                reasonMsg = "cihaz başka bir bağlantı ile meşgul";
+                                break;
+                        };
+
+                        Log.e(TAG, "onFailure: Wi-Fi P2P bağlantısı başarısız, " + reasonMsg);
+                    }
+                });
             }
         }
 
