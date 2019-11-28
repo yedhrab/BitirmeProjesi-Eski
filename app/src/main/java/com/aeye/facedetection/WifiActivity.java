@@ -106,7 +106,20 @@ public class WifiActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                Log.d(TAG, "onFailure: Keşif başarısız" + reason);
+                String reasonMsg = "";
+                switch (reason) {
+                    case WifiP2pManager.P2P_UNSUPPORTED:
+                        reasonMsg = "P2P desteklenmiyor";
+                        break;
+                    case WifiP2pManager.ERROR:
+                        reasonMsg = "hata oluştur";
+                        break;
+                    case WifiP2pManager.BUSY:
+                        reasonMsg = "cihaz başka bir bağlantı ile meşgul";
+                        break;
+                };
+
+                Log.d(TAG, "onFailure: Keşif başarısız, " + reasonMsg);
             }
         });
     }
