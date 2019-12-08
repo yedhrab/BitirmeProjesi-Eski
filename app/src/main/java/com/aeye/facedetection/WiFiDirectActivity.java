@@ -20,9 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
  * Wifi işlemleri yöneten sınıf
  * https://developer.android.com/guide/topics/connectivity/wifip2p.html#create-app
  */
-public class WifiActivity extends AppCompatActivity {
+public class WiFiDirectActivity extends AppCompatActivity {
 
-    public static final String TAG = "WiFiActivity";
+    public static final String TAG = WiFiDirectActivity.class.getSimpleName();
 
     private static final int PRC_ACCES_FINE_LOCATION = 1;
 
@@ -35,7 +35,7 @@ public class WifiActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wifi);
+        setContentView(R.layout.activity_wifi_direct);
 
         // Wifi alıcısına aktarılacak broadcast türlerini belirleme
         wifiFilter = new IntentFilter();
@@ -59,10 +59,10 @@ public class WifiActivity extends AppCompatActivity {
      */
     private void getRequiredPermissions() {
         if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, WifiActivity.PRC_ACCES_FINE_LOCATION);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, WiFiDirectActivity.PRC_ACCES_FINE_LOCATION);
         }
     }
 
@@ -95,13 +95,15 @@ public class WifiActivity extends AppCompatActivity {
     }
 
     public void onDiscoverButtonClick(View view) {
-        Log.d(TAG, "onDiscoverButtonClick: Discover butonuna tıklandı");
+        // TODO: Bağlnatı sağladıktan sonra tekrar tekrar istek atmayı bırakmalı
+
+        Log.v(TAG, "onDiscoverButtonClick: Discover butonuna tıklandı");
 
         // Eşleşebilir cihazları arama
         manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "onSuccess: Keşif başarılı");
+                Log.i(TAG, "onSuccess: Keşif başarılı, eşleşebilir cihazlar aranıyor...");
             }
 
             @Override
@@ -117,10 +119,15 @@ public class WifiActivity extends AppCompatActivity {
                     case WifiP2pManager.BUSY:
                         reasonMsg = "cihaz başka bir bağlantı ile meşgul";
                         break;
-                };
-
-                Log.d(TAG, "onFailure: Keşif başarısız, " + reasonMsg);
+                }
+                ;
+                Log.e(TAG, "onFailure: Keşif başarısız, " + reasonMsg);
             }
         });
+    }
+
+    public void onFileTransferClick(View view) {
+        Log.v(TAG, "onFileTransferClick: File Transfer butonuna tıklandı");
+        new FileServerAsyncTask(this).execute();
     }
 }

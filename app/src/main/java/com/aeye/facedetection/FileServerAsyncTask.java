@@ -22,8 +22,8 @@ import java.net.Socket;
  */
 public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
 
-    public static final String TAG = "FileServerAsyncTask";
-    public static final int PORT = 8888;
+    public static final String TAG = FileServerAsyncTask.class.getSimpleName();
+    public static final int PORT = 0; // For auto port allocation, make it 0
 
     private Context context;
 
@@ -35,10 +35,14 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... voids) {
         Log.d(TAG, "doInBackground: Dosya alma hizmeti başlatıldı");
         try {
+            Log.d(TAG, "doInBackground: Soket oluşturulup, bağlanmaya çalışılyor...");
             // Sunucu oluşturma ve istemcinin bağlanmasını bekleme (UI threadi bloklar)
             ServerSocket serverSocket = new ServerSocket(FileServerAsyncTask.PORT);
             Socket client = serverSocket.accept();
 
+            Log.i(TAG, "doInBackground: Socket'e başarıyla bağlanıldı.");
+
+            // Bağlantı başarılı olursa bu adıma geçecektir
             final File file = new File(Environment.getExternalStorageDirectory() + "/temp.jpg");
             File dirs = file.getParentFile();
             if (!dirs.exists()) {
@@ -72,7 +76,7 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
     }
 
     public static boolean copyFile(InputStream inputStream, OutputStream out) {
-        byte buf[] = new byte[1024];
+        byte[] buf = new byte[1024];
         int len;
         try {
             while ((len = inputStream.read(buf)) != -1) {

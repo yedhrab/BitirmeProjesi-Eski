@@ -17,31 +17,31 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static com.aeye.facedetection.WifiActivity.TAG;
-
 /**
  * Önemli WiFi olaylarını yayınlayan sınıf
  * https://developer.android.com/guide/topics/connectivity/wifip2p.html#create-br
  */
 public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements WifiP2pManager.PeerListListener {
 
-    private static final String DEVICE_PATTERN = "YEDHRAB-PC";
+    public static final String TAG = WiFiDirectBroadcastReciever.class.getSimpleName();
+    public static final int reconnect = 1;
+    private static final String DEVICE_PATTERN = "HUAWEI P20 lite";
 
     WifiP2pManager manager;
     Channel channel;
-    WifiActivity wifiActivity;
+    WiFiDirectActivity wifiDirectActivity;
 
     /**
      * Eşleşilen cihazların bilgileri
      */
     private List<WifiP2pDevice> peers = new ArrayList<>();
 
-    public WiFiDirectBroadcastReciever(WifiP2pManager manager, Channel channel, WifiActivity wifiActivity) {
+    public WiFiDirectBroadcastReciever(WifiP2pManager manager, Channel channel, WiFiDirectActivity wifiDirectActivity) {
         super();
 
         this.manager = manager;
         this.channel = channel;
-        this.wifiActivity = wifiActivity;
+        this.wifiDirectActivity = wifiDirectActivity;
     }
 
 
@@ -54,22 +54,22 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
             switch (action) {
                 // Wi-Fi P2P'nin aktif olup olmadığını anlama
                 case WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION:
-                    Log.d(TAG, "onReceive: Wi-Fi P2P durumu değişti");
+                    Log.v(TAG, "onReceive: Wi-Fi P2P durumu değişti");
 
                     int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
                     if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-                        Log.d(TAG, "onReceive: Wi-Fi P2P aktif");
+                        Log.i(TAG, "onReceive: Wi-Fi P2P aktif");
 
                     } else {
-                        Log.d(TAG, "onReceive: Wi-Fi P2P aktif değil");
+                        Log.i(TAG, "onReceive: Wi-Fi P2P aktif değil");
                     }
                     break;
                 // Call WifiP2pManager.requestPeers() to get a list of current peers
                 case WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION:
-                    Log.d(TAG, "onReceive: Wi-Fi P2P Eşlenebilir cihazların listesi değişti");
+                    Log.d(TAG, "onReceive: Wi-Fi P2P Eşlenebilir cihazların listesi değişti.");
 
                     if (manager != null) {
-                        Log.d(TAG, "onReceive: Eşleşme isteğinde bulunuldu");
+                        Log.d(TAG, "onReceive: Eşleşebilir cihazlar alınıyor...");
                         manager.requestPeers(channel, this);
                     }
                     break;
@@ -113,26 +113,33 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
         // ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
 
         if (peers.isEmpty()) {
-            Log.d(TAG, "onPeersAvailable: Eşleşebilecek cihaz bulunamadı");
-        } else {
-            WifiP2pDevice device = null;
-            for (WifiP2pDevice peer : peers) {
-                Log.d(TAG, "onPeersAvailable: Cihaz adı: " + peer.deviceName);
+            Log.w(TAG, "onPeersAvailable: Eşleşebilecek cihaz bulunamadı"); } else {
+            // Get the index of the device that we need to connect
+            int deviceIndex = -1;
+            for (int i = 0; i < peers.size(); i++) {
+                WifiP2pDevice peer = peers.get(i);
+
+                Log.d(TAG, "onPeersAvailable: Eşleşilebilecek cihazın adı: " + peer.deviceName);
                 if (peer.deviceName.contains(DEVICE_PATTERN)) {
-                    device = peer;
+                    deviceIndex = i;
                 }
             }
 
-            if (device != null) {
+            // Connect the device if it's found
+            if (deviceIndex != -1) {
+                final WifiP2pDevice device = peers.get(deviceIndex);
+
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
+
+                Log.d(TAG, "onPeersAvailable: " + device.deviceName + " cihazına bağlanılmaya çalışılıyor...");
 
                 // İlk cihaza bağlanma
                 manager.connect(channel, config, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        Log.d(TAG, "onSuccess: Wi-Fi P2P bağlantısı başarılı");
+                        Log.i(TAG, "onSuccess: " + device.deviceName + " cihazına bağlanıldı.");
                     }
 
                     @Override
@@ -149,9 +156,8 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
                                 reasonMsg = "cihaz başka bir bağlantı ile meşgul";
                                 break;
                         }
-                        ;
 
-                        Log.e(TAG, "onFailure: Wi-Fi P2P bağlantısı başarısız, " + reasonMsg);
+                        Log.e(TAG, "onFailure: " + device.deviceName + " cihazına bağlanılamadı.");
                     }
                 });
             }

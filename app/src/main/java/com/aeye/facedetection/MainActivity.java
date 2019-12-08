@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     void bindEvents() {
         btn_gallery.setOnClickListener((view) -> startActivity(new Intent(MainActivity.this, GalleryActivity.class)));
-        btn_wifi.setOnClickListener((view) -> startActivity(new Intent(MainActivity.this, WifiActivity.class)));
+        btn_wifi.setOnClickListener((view) -> startActivity(new Intent(MainActivity.this, WiFiDirectActivity.class)));
     }
 
 }
