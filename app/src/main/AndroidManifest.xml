@@ -5,6 +5,9 @@
     <!-- Gallery'e erişim için eklendi -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <!-- Foregorund servis için eklendi -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/face_deteciton"
@@ -17,7 +20,6 @@
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="face" />
 
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +29,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".GalleryActivity" />
+
+        <service
+            android:name=".TelemetryService"
+            android:enabled="true"
+            android:exported="false" />
 
     </application>
 
