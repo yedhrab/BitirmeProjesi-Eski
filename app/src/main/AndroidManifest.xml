@@ -8,6 +8,16 @@
     <!-- Foregorund servis için eklendi -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <!-- Wi-Fi Direct (P2P) bağlatısı için eklendi -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Wi-Fi Direct için gerekli olmayabilir (?) -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/face_deteciton"
@@ -29,6 +39,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".GalleryActivity" />
+        <activity android:name=".WiFiDirectActivity" />
 
         <service
             android:name=".TelemetryService"
