@@ -33,47 +33,46 @@ import java.util.Objects;
 
 import static android.content.Context.CAMERA_SERVICE;
 
-public class FaceDetection {
+abstract class FaceDetectionAPI {
     private static final String TAG = "ML KIT";
 
-    FirebaseVisionImage converFirebaseVisionImage(Image mediaImage, int rotation) {
+    static FirebaseVisionImage converFirebaseVisionImage(Image mediaImage, int rotation) {
         return FirebaseVisionImage.fromMediaImage(mediaImage, rotation);
     }
 
-    FirebaseVisionImage converFirebaseVisionImage(Bitmap bitmap) {
+    static FirebaseVisionImage converFirebaseVisionImage(Bitmap bitmap) {
         return FirebaseVisionImage.fromBitmap(bitmap);
     }
 
-    FirebaseVisionImage converFirebaseVisionImage(ByteBuffer buffer, int rotation) {
+    static FirebaseVisionImage converFirebaseVisionImage(ByteBuffer buffer, int rotation) {
         FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
                 .setWidth(480)   // 480x360 is typically sufficient for
                 .setHeight(360)  // image recognition
                 .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
                 .setRotation(rotation)
                 .build();
-        // [END set_metadata]
-        // [START image_from_buffer]
+
         return FirebaseVisionImage.fromByteBuffer(buffer, metadata);
     }
 
-    FirebaseVisionImage converFirebaseVisionImage(byte[] byteArray, int rotation) {
+    static FirebaseVisionImage converFirebaseVisionImage(byte[] byteArray, int rotation) {
         FirebaseVisionImageMetadata metadata = new FirebaseVisionImageMetadata.Builder()
                 .setWidth(480)   // 480x360 is typically sufficient for
                 .setHeight(360)  // image recognition
                 .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
                 .setRotation(rotation)
                 .build();
-        // [START image_from_array]
+
         return FirebaseVisionImage.fromByteArray(byteArray, metadata);
-        // [END image_from_array]
     }
 
-    FirebaseVisionImage converFirebaseVisionImage(Context context, Uri uri) throws IOException{
+    static FirebaseVisionImage converFirebaseVisionImage(Context context, Uri uri) throws IOException {
         return FirebaseVisionImage.fromFilePath(context, uri);
     }
 
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -83,9 +82,10 @@ public class FaceDetection {
 
     /**
      * Resim üzerindeki yüzleri algılama
+     *
      * @param image Resim verisi
      */
-    void detectFaces(FirebaseVisionImage image) {
+    static void detectFaces(FirebaseVisionImage image, DetectListener detectListener) {
         // Yüz algılama modeli ayaları
         FirebaseVisionFaceDetectorOptions options =
                 new FirebaseVisionFaceDetectorOptions.Builder()
@@ -101,24 +101,16 @@ public class FaceDetection {
                 .getVisionFaceDetector(options);
 
         Task<List<FirebaseVisionFace>> result = detector.detectInImage(image)
-                .addOnSuccessListener((faceList) -> {
-                        for (FirebaseVisionFace face : faceList) {
-                            // TODO: Burada işlemler yapılacak
-                            Rect bounds = face.getBoundingBox();
-                            Log.i(TAG, String.format("(%s, %s, %s, %s", bounds.bottom, bounds.left, bounds.right, bounds.top));
-                        }
-                })
+                .addOnSuccessListener(detectListener::onDetect)
                 .addOnFailureListener(Throwable::printStackTrace);
     }
-
-
 
     /**
      * Get the angle by which an image must be rotated given the device's current
      * orientation.
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private int getRotationCompensation(String cameraId, Activity activity, Context context)
+    static private int getRotationCompensation(String cameraId, Activity activity, Context context)
             throws CameraAccessException {
         // Get the device's current rotation relative to its "native" orientation.
         // Then, from the ORIENTATIONS table, look up the angle the image must be
@@ -162,5 +154,9 @@ public class FaceDetection {
 
         // Return the corresponding FirebaseVisionImageMetadata rotation value.
         return result;
+    }
+
+    interface DetectListener {
+        void onDetect(List<FirebaseVisionFace> faceList);
     }
 }
