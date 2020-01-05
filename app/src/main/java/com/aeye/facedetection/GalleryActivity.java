@@ -26,6 +26,8 @@ public class GalleryActivity extends AppCompatActivity {
     private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
 
+    public static final String TAG = "GalleryActivity";
+
     ImageView iv_detected_image;
 
     @Override
