@@ -113,7 +113,8 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
         // ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
 
         if (peers.isEmpty()) {
-            Log.w(TAG, "onPeersAvailable: Eşleşebilecek cihaz bulunamadı"); } else {
+            Log.w(TAG, "onPeersAvailable: Eşleşebilecek cihaz bulunamadı");
+        } else {
             // Get the index of the device that we need to connect
             int deviceIndex = -1;
             for (int i = 0; i < peers.size(); i++) {
