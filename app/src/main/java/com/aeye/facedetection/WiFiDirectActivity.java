@@ -14,7 +14,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Objects;
 
 /**
  * Wifi işlemleri yöneten sınıf
@@ -23,33 +26,40 @@ import androidx.appcompat.app.AppCompatActivity;
 public class WiFiDirectActivity extends AppCompatActivity {
 
     public static final String TAG = WiFiDirectActivity.class.getSimpleName();
-
     private static final int PRC_ACCES_FINE_LOCATION = 1;
-
+    private final IntentFilter wifiFilter = new IntentFilter();
     WifiP2pManager manager;
     Channel channel;
     BroadcastReceiver wifiReceiver;
-
-    IntentFilter wifiFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wifi_direct);
 
-        // Wifi alıcısına aktarılacak broadcast türlerini belirleme
-        wifiFilter = new IntentFilter();
+        initWifiFilter();
+        initDependences();
+    }
+
+    /**
+     * Wifi alıcısına aktarılacak broadcast türlerini belirleme
+     */
+    private void initWifiFilter() {
         wifiFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         wifiFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         wifiFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         wifiFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+    }
 
+    private void initDependences() {
         // WiFi değişikliklerinde reciever'ı çalıştırma
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        if (manager != null) {
-            // Wi-Fi P2P Frameworkü ile uygulamamıza bağlanmayı sağlayacak obje
-            channel = manager.initialize(this, getMainLooper(), null);
+        Objects.requireNonNull(manager);
 
+        // Wi-Fi P2P Frameworkü ile uygulamamıza bağlanmayı sağlayacak obje
+        channel = manager.initialize(this, getMainLooper(), null);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getRequiredPermissions();
         }
     }
@@ -57,21 +67,23 @@ public class WiFiDirectActivity extends AppCompatActivity {
     /**
      * Wi-Fi P2P için gerekli izinleri alma
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void getRequiredPermissions() {
-        if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, WiFiDirectActivity.PRC_ACCES_FINE_LOCATION);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public boolean hasPermission(String permission) {
+        return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PRC_ACCES_FINE_LOCATION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG, "Fine locaiton izni gereklidir");
-            } else {
+                Log.w(TAG, "onRequestPermissionsResult: Fine location izni gereklidir");
                 Toast.makeText(this, "İzinler gereklidir 😥", Toast.LENGTH_SHORT).show();
             }
         }
@@ -81,18 +93,31 @@ public class WiFiDirectActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Alıcıyı oluşturma ve sisteme kaydetme
-        wifiReceiver = new WiFiDirectBroadcastReciever(manager, channel, this);
-        registerReceiver(wifiReceiver, wifiFilter);
+        registerWifiFilter();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        // Alıcının kaydını silme
+        unregisterWifiFilter();
+    }
+
+    /**
+     * Broadcast alıcısını oluşturma ve sisteme kaydetme
+     */
+    private void registerWifiFilter() {
+        wifiReceiver = new WiFiDirectBroadcastReciever(manager, channel, this);
+        registerReceiver(wifiReceiver, wifiFilter);
+    }
+
+    /**
+     * Broadcast alıcısının kaydını silme
+     */
+    private void unregisterWifiFilter() {
         unregisterReceiver(wifiReceiver);
     }
+
 
     public void onDiscoverButtonClick(View view) {
         // TODO: Bağlnatı sağladıktan sonra tekrar tekrar istek atmayı bırakmalı
