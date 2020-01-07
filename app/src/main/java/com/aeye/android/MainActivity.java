@@ -1,4 +1,4 @@
-package com.aeye.facedetection;
+package com.aeye.android;
 
 import android.Manifest;
 import android.content.Intent;
@@ -15,9 +15,8 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btn_gallery, btn_telemetry, btn_wifi;
-
     static final int PERMISSION_FOREGORUND = 1;
+    Button btn_gallery, btn_telemetry, btn_wifi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

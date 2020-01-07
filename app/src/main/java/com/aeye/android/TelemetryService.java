@@ -1,4 +1,4 @@
-package com.aeye.facedetection;
+package com.aeye.android;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,39 +22,15 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 public class TelemetryService extends Service {
-    private static final String TAG = "TelemetryService";
-
-    private static final int REQUEST_SHOW_CONTENT = 0;
-    private static final int REQUEST_STOP = 1;
-
     static final String ACTION_START_SERVICE = "Start telemetry service";
     static final String ACTION_STOP_SERVICE = "Stop telemetry service";
-
-
+    private static final String TAG = "TelemetryService";
+    private static final int REQUEST_SHOW_CONTENT = 0;
+    private static final int REQUEST_STOP = 1;
     private Looper telemetryLooper;
     private TelemetryHandler telemetryHandler;
 
     public TelemetryService() {
-    }
-
-    private final class TelemetryHandler extends Handler {
-        public TelemetryHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            try {
-                Log.d(TAG, "Mesaj alındı");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Kesme isteği geldiğinde isteği uygulama
-                Thread.currentThread().interrupt();
-            }
-
-            // Servisin tekrar tekrar oluşturulmasından dolayı oluşan maliyeti engellemek adına kapatıldı
-            // stopSelf(msg.arg1);
-        }
     }
 
     @Override
@@ -165,5 +141,25 @@ public class TelemetryService extends Service {
     @Override
     public void onDestroy() {
         Log.d(TAG, "Servis kapatıldı");
+    }
+
+    private final class TelemetryHandler extends Handler {
+        public TelemetryHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            try {
+                Log.d(TAG, "Mesaj alındı");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // Kesme isteği geldiğinde isteği uygulama
+                Thread.currentThread().interrupt();
+            }
+
+            // Servisin tekrar tekrar oluşturulmasından dolayı oluşan maliyeti engellemek adına kapatıldı
+            // stopSelf(msg.arg1);
+        }
     }
 }

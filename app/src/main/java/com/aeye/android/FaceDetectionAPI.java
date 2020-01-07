@@ -1,9 +1,8 @@
-package com.aeye.facedetection;
+package com.aeye.android;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -13,9 +12,7 @@ import android.os.Build;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.tasks.Task;
@@ -35,6 +32,14 @@ import static android.content.Context.CAMERA_SERVICE;
 
 abstract class FaceDetectionAPI {
     private static final String TAG = "ML KIT";
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 90);
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+    }
 
     static FirebaseVisionImage converFirebaseVisionImage(Image mediaImage, int rotation) {
         return FirebaseVisionImage.fromMediaImage(mediaImage, rotation);
@@ -68,16 +73,6 @@ abstract class FaceDetectionAPI {
 
     static FirebaseVisionImage converFirebaseVisionImage(Context context, Uri uri) throws IOException {
         return FirebaseVisionImage.fromFilePath(context, uri);
-    }
-
-
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
     /**

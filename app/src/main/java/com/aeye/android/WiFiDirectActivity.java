@@ -1,4 +1,4 @@
-package com.aeye.facedetection;
+package com.aeye.android;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;

@@ -1,8 +1,4 @@
-package com.aeye.facedetection;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+package com.aeye.android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -16,6 +12,10 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 
@@ -23,11 +23,9 @@ import java.io.IOException;
 
 public class GalleryActivity extends AppCompatActivity {
 
+    public static final String TAG = "GalleryActivity";
     private static final int IMAGE_PICK_CODE = 1000;
     private static final int PERMISSION_CODE = 1001;
-
-    public static final String TAG = "GalleryActivity";
-
     ImageView iv_detected_image;
 
     @Override

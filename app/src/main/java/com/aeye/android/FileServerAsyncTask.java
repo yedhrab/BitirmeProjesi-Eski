@@ -1,4 +1,4 @@
-package com.aeye.facedetection;
+package com.aeye.android;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +28,23 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
 
     public FileServerAsyncTask(Context context) {
         this.context = context;
+    }
+
+    public static boolean copyFile(InputStream inputStream, OutputStream out) {
+        byte[] buf = new byte[1024];
+        int len;
+        try {
+            while ((len = inputStream.read(buf)) != -1) {
+                out.write(buf, 0, len);
+
+            }
+            out.close();
+            inputStream.close();
+        } catch (IOException e) {
+            Log.d(TAG, e.toString());
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -73,22 +89,5 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
         intent.setAction(android.content.Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse("file://" + result), "image/*");
         context.startActivity(intent);
-    }
-
-    public static boolean copyFile(InputStream inputStream, OutputStream out) {
-        byte[] buf = new byte[1024];
-        int len;
-        try {
-            while ((len = inputStream.read(buf)) != -1) {
-                out.write(buf, 0, len);
-
-            }
-            out.close();
-            inputStream.close();
-        } catch (IOException e) {
-            Log.d(TAG, e.toString());
-            return false;
-        }
-        return true;
     }
 }
