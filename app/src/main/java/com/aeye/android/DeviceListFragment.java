@@ -3,6 +3,8 @@ package com.aeye.android;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +26,7 @@ import java.util.Objects;
  *
  * @see <a href="https://android.googlesource.com/platform/development/+/master/samples/WiFiDirectDemo/src/com/example/android/wifidirect/DeviceListFragment.java?autodive=0%2F%2F%2F">WifiDirect Demo</a>
  */
-public class DeviceListFragment extends ListFragment {
+public class DeviceListFragment extends ListFragment implements WifiP2pManager.PeerListListener {
 
     private final List<WifiP2pDevice> peers = new ArrayList<>();
     private View contentView;
@@ -59,6 +61,11 @@ public class DeviceListFragment extends ListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         this.setListAdapter(new WifiPeerListAdapter(Objects.requireNonNull(getActivity()), R.layout.layout_row_devices, peers));
+    }
+
+    @Override
+    public void onPeersAvailable(WifiP2pDeviceList peers) {
+
     }
 
     private class WifiPeerListAdapter extends ArrayAdapter<WifiP2pDevice> {

@@ -10,6 +10,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -70,7 +71,9 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
 
                     if (manager != null) {
                         Log.d(TAG, "onReceive: Eşleşebilir cihazlar alınıyor...");
-                        manager.requestPeers(channel, this);
+                        manager.requestPeers(
+                                channel, (PeerListListener) wifiDirectActivity
+                                        .getFragmentManager().findFragmentById(R.id.frag_list));
                     }
                     break;
                 // Respond to new connection or disconnections
@@ -89,6 +92,7 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
                     if (networkInfo.isConnected()) {
                         manager.requestConnectionInfo(channel, (info) -> {
                             Log.d(TAG, "onReceive: P2P bağlantı verisi: " + info);
+                            
                         });
                     }
 
