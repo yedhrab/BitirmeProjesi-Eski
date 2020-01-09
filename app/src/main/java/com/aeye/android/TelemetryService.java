@@ -73,14 +73,14 @@ public class TelemetryService extends Service {
 
 
         Notification notification = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.face_deteciton)
                 .setContentTitle("Gözlük ile haberleşme aktif")
                 .setContentText("Akıllı gözlüğünüz ile arkaplanda haberleşme gerçekleşmektedir")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
-                .addAction(R.mipmap.ic_launcher_foreground, "Kapat", pStopSelf)
+                .addAction(R.drawable.face_deteciton, "Kapat", pStopSelf)
                 .build();
 
         startForeground(101, notification);
