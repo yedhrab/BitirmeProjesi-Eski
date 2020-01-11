@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.ListFragment;
 
 import java.util.ArrayList;
@@ -28,7 +29,10 @@ import java.util.Objects;
  */
 public class DeviceListFragment extends ListFragment implements WifiP2pManager.PeerListListener {
 
-    private final List<WifiP2pDevice> peers = new ArrayList<>();
+    public static final String TAG = DeviceListFragment.class.getName();
+    private final List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+
+    private AlertDialog alertDialog;
     private View contentView;
 
     private static String getDeviceStatus(int deviceStatus) {
@@ -64,8 +68,18 @@ public class DeviceListFragment extends ListFragment implements WifiP2pManager.P
     }
 
     @Override
-    public void onPeersAvailable(WifiP2pDeviceList peers) {
+    public void onPeersAvailable(WifiP2pDeviceList peerList) {
+        // TODO: https://www.one-tab.com/page/aFZ1mdprQx27jPXerh8ZKg
+        if (alertDialog != null && alertDialog.isShowing()) {
+            alertDialog.dismiss();
+        }
 
+        peers.clear();
+        peers.addAll(peerList.getDeviceList());
+        ((WifiPeerListAdapter) Objects.requireNonNull(getListAdapter())).notifyDataSetChanged();
+        if (peers.size() == 0) {
+            Log.d(TAG, "onPeersAvailable: Cihaz bulunamadı");
+        }
     }
 
     private class WifiPeerListAdapter extends ArrayAdapter<WifiP2pDevice> {
