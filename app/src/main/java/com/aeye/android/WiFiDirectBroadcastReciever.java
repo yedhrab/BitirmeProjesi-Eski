@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.util.Log;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -91,8 +92,9 @@ public class WiFiDirectBroadcastReciever extends BroadcastReceiver implements Wi
                     );
                     if (networkInfo.isConnected()) {
                         manager.requestConnectionInfo(channel, (info) -> {
-                            Log.d(TAG, "onReceive: P2P bağlantı verisi: " + info);
-                            
+                            Log.d(TAG, "onReceive: P2P bağlantı verisi: " + info.toString());
+                            InetAddress inetAddress = info.groupOwnerAddress;
+                            new FileServerAsyncTask(wifiDirectActivity, inetAddress).execute();
                         });
                     }
 

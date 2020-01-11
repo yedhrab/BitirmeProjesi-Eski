@@ -150,9 +150,4 @@ public class WiFiDirectActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void onFileTransferClick(View view) {
-        Log.v(TAG, "onFileTransferClick: File Transfer butonuna tıklandı");
-        new FileServerAsyncTask(this).execute();
-    }
 }
