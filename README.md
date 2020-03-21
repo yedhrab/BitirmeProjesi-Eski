@@ -1,5 +1,5 @@
-# YedEye-FaceDetection
+# 🕰️ YedEye Old
 
-⭐ YedEye projesinin eski kodları
+YedEye projesinin eski kodları
 
-> _Güncellenmemektedir_
+> 🕐 _Güncellenmemektedir_
