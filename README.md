@@ -8,7 +8,8 @@ YedEye projesinin eski kodları
 
 * 📶 WiFi Direct
 * 🔥 Firebase MLKit
-* ☀️ Foreground 
+* ☀️ Foreground Service
+* 🖼️ Image picker
 
 > 📢 Tüm kodlar [Android ~ YEmreAk](httos://android.yemreak.com) üzerine not alınmıştır.
 
