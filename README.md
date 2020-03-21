@@ -1,3 +1,5 @@
-# AEye-FaceDetection
+# YedEye-FaceDetection
 
-👨 AEye projesinin yüz tanıma çalışması
+⭐ YedEye projesinin eski kodları
+
+> _Güncellenmemektedir_
