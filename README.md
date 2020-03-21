@@ -15,4 +15,4 @@ YedEye projesinin eski kodları
 
 # 🔒 License
 
-Apache ~ Yunus Emre AK
+Apache License 2 ~ Yunus Emre AK
